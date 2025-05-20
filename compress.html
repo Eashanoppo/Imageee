@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compress and Download</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f8f8;
+            text-align: center;
+            padding: 50px 20px;
+            margin: 0;
+            color: #333;
+            overflow-x: auto; /* Horizontal scroll bar */
+        }
+
+        .logo {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            position: sticky;
+            top: 0;
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif;
+            font-size: 2.5em;
+            font-style: italic;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        #upload-section {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+
+        .upload-btn, #compress-btn, #download-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .upload-btn:hover, #compress-btn:hover, #download-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .upload-btn:active, #compress-btn:active, #download-btn:active {
+            transform: scale(0.98);
+        }
+
+        #canvas {
+            margin-top: 20px;
+            max-width: 100%;
+            display: none;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 1rem;
+            color: #555;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">Imageee</div>
+    <h1>Compress and Download</h1>
+    <div id="upload-section">
+        <p>Upload an image to compress</p>
+        <label class="upload-btn" for="image-input">Choose File</label>
+        <input type="file" id="image-input" accept="image/*" style="display: none;" />
+    </div>
+    <canvas id="canvas"></canvas>
+    <button id="compress-btn">Compress Image</button>
+    <button id="download-btn" style="display: none;">Download Image</button>
+
+    <footer>
+        <p>© A project of UNLEFT</p>
+    </footer>
+
+    <script>
+        const imageInput = document.getElementById("image-input");
+        const canvas = document.getElementById("canvas");
+        const compressBtn = document.getElementById("compress-btn");
+        const downloadBtn = document.getElementById("download-btn");
+        let uploadedImage, compressedImage;
+
+        // Step 1: Handle image upload and display it on canvas
+        imageInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    uploadedImage = new Image();
+                    uploadedImage.src = reader.result;
+                    uploadedImage.onload = () => {
+                        const ctx = canvas.getContext("2d");
+                        canvas.width = uploadedImage.width;
+                        canvas.height = uploadedImage.height;
+                        ctx.drawImage(uploadedImage, 0, 0);
+                        canvas.style.display = "block";
+                        downloadBtn.style.display = "none"; // Hide download button until compressed
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Step 2: Compress the image when the "Compress" button is clicked
+        compressBtn.addEventListener("click", () => {
+            if (uploadedImage) {
+                const ctx = canvas.getContext("2d");
+                const maxWidth = 800; // Maximum width for compression
+                const scale = maxWidth / uploadedImage.width;
+
+                // Set canvas size for compression
+                canvas.width = maxWidth;
+                canvas.height = uploadedImage.height * scale;
+                ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+
+                // Convert the canvas content to a Data URL
+                compressedImage = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+                downloadBtn.style.display = "inline-block"; // Show download button
+                alert("Imageee successfully compressed your image by 80%.");
+            }
+        });
+
+        // Step 3: Download the compressed image when the "Download" button is clicked
+        downloadBtn.addEventListener("click", () => {
+            if (compressedImage) {
+                const link = document.createElement('a');
+                link.href = compressedImage;
+                link.download = 'compressed-image.jpg';
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>

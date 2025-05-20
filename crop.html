@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop The uNwanTed</title>
+    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f8f8;
+            text-align: center;
+            padding: 50px 20px;
+            margin: 0;
+            color: #333;
+            overflow-x: auto; /* Enables horizontal scroll */
+        }
+
+        .logo {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            position: sticky;
+            top: 0;
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif;
+            font-size: 3em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+            font-style: italic; /* Stylish italic effect */
+            letter-spacing: 2px;
+        }
+
+        #upload-section, #aspect-ratio-section, #download-section, #custom-size-section {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        #crop-area {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        canvas {
+            width: 100%;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 1rem;
+            color: #555;
+            font-weight: bold;
+        }
+
+        #custom-size-section input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1rem;
+            width: 80px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">Imageee</div>
+    <h1>Crop The uNwanTed</h1>
+    <div id="upload-section">
+        <p>Upload an image to crop</p>
+        <label class="btn" for="image-input">Choose File</label>
+        <input type="file" id="image-input" accept="image/*" style="display: none;" />
+    </div>
+    
+    <!-- Crop Area -->
+    <div id="crop-area">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="aspect-ratio-section">
+        <h2>Select Aspect Ratio</h2>
+        <button class="btn" data-ratio="4/3">4:3</button>
+        <button class="btn" data-ratio="16/9">16:9</button>
+        <button class="btn" data-ratio="1/1">1:1</button>
+        <button class="btn" data-ratio="2/1">2:1</button>
+        <button class="btn" data-ratio="7/8">7:8</button>
+        <button class="btn" data-ratio="8/9">8:9</button>
+        <button class="btn" data-ratio="4/7">4:7</button>
+    </div>
+
+    <!-- Custom Size Input Section -->
+    <div id="custom-size-section">
+        <h2>Enter Custom Crop Size (px)</h2>
+        <input type="number" id="custom-width" placeholder="Width" />
+        <input type="number" id="custom-height" placeholder="Height" />
+        <button class="btn" id="resize-btn">Resize Crop Area</button>
+    </div>
+
+    <div id="download-section">
+        <button class="btn" id="download-btn">Download Cropped Image</button>
+    </div>
+
+    <footer>
+        <p>© A project of UNLEFT</p>
+    </footer>
+
+    <script>
+        const imageInput = document.getElementById("image-input");
+        const canvas = document.getElementById("canvas");
+        const downloadBtn = document.getElementById("download-btn");
+        const aspectRatioButtons = document.querySelectorAll("#aspect-ratio-section .btn");
+        const customWidthInput = document.getElementById("custom-width");
+        const customHeightInput = document.getElementById("custom-height");
+        const resizeBtn = document.getElementById("resize-btn");
+
+        let uploadedImage;
+        let cropper;
+        let aspectRatio = NaN;
+
+        // Handle image upload and display it
+        imageInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    uploadedImage = new Image();
+                    uploadedImage.src = reader.result;
+                    uploadedImage.onload = () => {
+                        if (cropper) cropper.destroy(); // Destroy previous cropper instance
+                        canvas.width = uploadedImage.width;
+                        canvas.height = uploadedImage.height;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(uploadedImage, 0, 0);
+                        initCropper();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Initialize Cropper.js
+        function initCropper() {
+            cropper = new Cropper(canvas, {
+                aspectRatio: aspectRatio,
+                viewMode: 2,
+                dragMode: 'move',
+                zoomable: true,
+                scalable: true,
+            });
+        }
+
+        // Handle aspect ratio button clicks
+        aspectRatioButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const ratio = button.getAttribute("data-ratio");
+                aspectRatio = eval(ratio); // Convert ratio string to number
+                if (cropper) cropper.setAspectRatio(aspectRatio);
+            });
+        });
+
+        // Resize crop area when "Resize Crop Area" button is clicked
+        resizeBtn.addEventListener("click", () => {
+            const width = parseInt(customWidthInput.value);
+            const height = parseInt(customHeightInput.value);
+
+            if (width && height) {
+                if (cropper) {
+                    cropper.setCropBoxData({ width, height });
+                }
+            }
+        });
+
+        // Handle downloading the cropped image
+        downloadBtn.addEventListener("click", () => {
+            if (cropper) {
+                const croppedCanvas = cropper.getCroppedCanvas();
+                const croppedImage = croppedCanvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.href = croppedImage;
+                link.download = 'cropped-image.png';
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>
