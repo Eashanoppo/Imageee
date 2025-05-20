@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Imageee - AI Background Remover, Crop & Compress</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      animation: fadeIn 1s ease-out;
+    }
+
+    /* Navigation Bar */
+    #navbar {
+      background-color: #333;
+      padding: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: slideInNav 1s ease-out;
+    }
+
+    .hamburger {
+      cursor: pointer;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .bar {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 5px 0;
+      transition: all 0.4s ease;
+    }
+
+    .hamburger.active .bar:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active .bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active .bar:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    #menu {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      animation: fadeSlideDown 0.5s ease forwards;
+    }
+
+    #menu a {
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-top: 1px solid #444;
+      transition: background 0.3s ease;
+    }
+
+    #menu a:hover {
+      background-color: #007bff;
+    }
+
+    /* Hero Section */
+    .hero {
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      padding: 80px 20px;
+      text-align: center;
+      animation: slideIn 1s ease-out;
+    }
+
+    .hero h1 {
+      font-size: 3em;
+      font-family: 'Brush Script MT', cursive;
+      margin: 0;
+      animation: bounceIn 1.5s ease-out;
+    }
+
+    .hero p {
+      font-size: 1.2em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .hero .cta-btn {
+      margin-top: 30px;
+      padding: 15px 40px;
+      font-size: 1.1em;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .hero .cta-btn:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    /* Features Section */
+    .features {
+      display: flex;
+      justify-content: space-around;
+      padding: 50px 20px;
+      background: #fff;
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    .feature {
+      text-align: center;
+      width: 30%;
+      animation: bounceInUp 1.5s ease-out;
+    }
+
+    .feature i {
+      font-size: 3em;
+      color: #007bff;
+    }
+
+    .feature h3 {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+
+    .feature p {
+      font-size: 1.1em;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .feature .go-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .feature .go-btn:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    /* About Section */
+    .about {
+      padding: 50px 20px;
+      background-color: #f8f8f8;
+      text-align: center;
+    }
+
+    .about h2 {
+      font-size: 2.5em;
+      color: #007bff;
+      margin-bottom: 30px;
+    }
+
+    .about p {
+      font-size: 1.2em;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #555;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+      padding: 0 10px;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #007bff;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInNav {
+      from {
+        transform: translateY(-50px);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0);
+      }
+      60% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes bounceInUp {
+      0% {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      60% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .features {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .feature {
+        width: 80%;
+        margin-bottom: 30px;
+      }
+
+      #menu {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div id="navbar">
+    <div class="hamburger" onclick="toggleMenu()">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div id="menu" class="dropdown-content">
+      <a href="remove.html">Remove Background</a>
+      <a href="crop.html">Crop Anything</a>
+      <a href="compress.html">Compress Image</a>
+      <a href="terms.html">Terms & Conditions</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Welcome to Imageee</h1>
+    <p>Effortlessly remove backgrounds, crop images, and compress them with cutting-edge AI technology.</p>
+    <button class="cta-btn" onclick="window.location.href='remove.html'">Start Removing Background</button>
+  </div>
+
+  <!-- Features Section -->
+  <div class="features">
+    <div class="feature">
+      <i class="fas fa-upload"></i>
+      <h3>Remove Background</h3>
+      <p>Upload any image and easily remove the background in seconds using AI-powered technology.</p>
+      <button class="go-btn" onclick="window.location.href='remove.html'">Go</button>
+    </div>
+    <div class="feature">
+      <i class="fas fa-crop"></i>
+      <h3>Crop Anything</h3>
+      <p>Perfectly crop images for your specific needs with a few simple clicks.</p>
+      <button class="go-btn" onclick="window.location.href='crop.html'">Go</button>
+    </div>
+    <div class="feature">
+      <i class="fas fa-compress"></i>
+      <h3>Compress Image</h3>
+      <p>Quickly compress large images while maintaining high quality for web usage.</p>
+      <button class="go-btn" onclick="window.location.href='compress.html'">Go</button>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="about">
+    <h2>What is Imageee?</h2>
+    <p>Imageee is an all-in-one image editing platform. With the power of AI, we make background removal, cropping, and image compression quick and easy for everyone, whether you're a professional or just need a fast solution.</p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© A Project of UNLEFT | <a href="terms.html">Terms & Conditions</a> | <a href="privacy.html">Privacy Policy</a></p>
+  </footer>
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+  <!-- Hamburger Toggle Script -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      const hamburger = document.querySelector(".hamburger");
+      hamburger.classList.toggle("active");
+      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    }
+  </script>
+</body>
+</html>
